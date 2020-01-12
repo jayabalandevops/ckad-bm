@@ -40,7 +40,7 @@ Mounting a ConfigMap
 
 1. ConfigMap environment variables in Pod
 
-```shell
+```yaml
 apiVersion: v1
 kind: Pod
 metadata: 
@@ -54,7 +54,7 @@ spec:
           name: db-config
 ```
 
-```shell
+```bash
 $ kubectl exec -it nginx -- envFrom
 DB=staging
 USERNAME=jdoe
@@ -63,7 +63,7 @@ USERNAME=jdoe
 
 2. ConfigMap in Pod as Volumes
 
-```shell
+```yaml
 apiVersion: v1
 kind: Pod
 metadata:
@@ -81,7 +81,7 @@ spec:
 	  name: db-config
 ```
 
-```shell
+```bash
 $ kubectl exec -it backend -- /bin/sh
 # ls /etc/config
 db
