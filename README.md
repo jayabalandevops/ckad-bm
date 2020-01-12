@@ -49,7 +49,7 @@ spec:
   containers:
   - image: nginx
     name: backend
-	envFrom:
+    envFrom:
       - configMapRef:
           name: db-config
 ```
