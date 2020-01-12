@@ -12,7 +12,7 @@
 
 Creating ConfigMaps (Imperative)
 
-```shell
+```bash
 # Literal values
 $ kubectl create configmap db-config --from-literal=db=staging
 
@@ -24,7 +24,7 @@ $ kubectl create configmap db-config --from-file=config.txt
 ```
 Definition of a ConfigMap (declarative)
 
-```shell
+```yaml
 apiVersion: v1
 data:
   db: staging
