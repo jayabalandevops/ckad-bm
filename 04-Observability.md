@@ -1,4 +1,4 @@
-# Observability (18%)
+# Observability
 
 ## Defining a Pod’s Readiness and Liveness Probe
 
