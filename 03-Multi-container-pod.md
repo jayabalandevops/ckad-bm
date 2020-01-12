@@ -1,96 +1,10 @@
 # Multi-Container Pods
 
-## Implementing the Adapter Pattern
-
-The adapter pattern helps with providing a simplified, homogenized view of an application running within a container. For example, we could stand up another container that unifies the log output of the application container. As a result, other monitoring tools can rely on a standardized view of the log output without having to transform it into an expected format.
-
-1. Create a new Pod in a YAML file named `adapter.yaml`. The Pod declares two containers. The container `app` uses the image `busybox` and runs the command `while true; do echo "$(date) | $(du -sh ~)" >> /var/logs/diskspace.txt; sleep 5; done;`. The adapter container `transformer` uses the image `busybox` and runs the command `sleep 20; while true; do while read LINE; do echo "$LINE" | cut -f2 -d"|" >> $(date +%Y-%m-%d-%H-%M-%S)-transformed.txt; done < /var/logs/diskspace.txt; sleep 20; done;` to strip the log output off the date for later consumption my a monitoring tool. Be aware that the logic does not handle corner cases (e.g. automatically deleting old entries) and would look different in production systems.
-2. Before creating the Pod, define an `emptyDir` volume. Mount the volume in both containers with the path `/var/logs`.
-3. Create the Pod, log into the container `transformer`. The current directory should continuously write a new file every 20 seconds.
-
-<details><summary>Show Solution</summary>
-<p>
-
-```bash
-kubectl run adapter --image=busybox --restart=Never -o yaml --dry-run -- /bin/sh -c 'while true; do echo "$(date) | $(du -sh ~)" >> /var/logs/diskspace.txt; sleep 5; done;' > adapter.yaml
-```
-The final Pod YAML file should look something like this:
-
-```yaml
-apiVersion: v1
-kind: Pod
-metadata:
-  creationTimestamp: null
-  name: adapter
-spec:
-  volumes:
-    - name: config-volume
-      emptyDir: {}
-  containers:
-  - args:
-    - /bin/sh
-    - -c
-    - 'while true; do echo "$(date) | $(du -sh ~)" >> /var/logs/diskspace.txt; sleep 5; done;'
-    image: busybox
-    name: app
-    volumeMounts:
-      - name: config-volume
-        mountPath: /var/logs
-    resources: {}
-  - image: busybox
-    name: transformer
-    args:
-    - /bin/sh
-    - -c
-    - 'sleep 20; while true; do while read LINE; do echo "$LINE" | cut -f2 -d"|" >> $(date +%Y-%m-%d-%H-%M-%S)-transformed.txt; done < /var/logs/diskspace.txt; sleep 20; done;'
-    volumeMounts:
-      - name: config-volume
-        mountPath: /var/logs
-  dnsPolicy: ClusterFirst
-  restartPolicy: Never
-status: {}
-```
-
-
-```bash
-$ kubectl exec adapter --container=transformer -it -- /bin/sh
-/ # ls -l
--rw-r--r--    1 root     root           205 May 12 20:43 2019-05-12-20-43-32-transformed.txt
--rw-r--r--    1 root     root           369 May 12 20:43 2019-05-12-20-43-52-transformed.txt
-...
-/ # cat 2019-05-12-20-43-52-transformed.txt
- 4.0K	/root
- 4.0K	/root
- 4.0K	/root
- 4.0K	/root
- 4.0K	/root
- 4.0K	/root
- 4.0K	/root
- 4.0K	/root
- 4.0K	/root
- 4.0K	/root
- 4.0K	/root
- 4.0K	/root
- 4.0K	/root
- 4.0K	/root
- 4.0K	/root
- 4.0K	/root
- 4.0K	/root
-/ # exit
-```
-
-</p>
-</details>
-
-
-
-# Exercise 7
-
-In this exercise, you will initialize a web application by standing up environment-specific configuration through an init container.
-
 ## Creating an Init Container
 
-Kubernetes runs an init container before the main container. In this scenario, the init container retrieves configuration files from a remote location and makes it available to the application running in the main container. The configuration files are shared through a volume mounted by both containers. The running application consumes the configuration files and can render its values.
+- Initialize a web application by standing up environment-specific configuration through an init container.
+
+- Kubernetes runs an init container before the main container. In this scenario, the init container retrieves configuration files from a remote location and makes it available to the application running in the main container. The configuration files are shared through a volume mounted by both containers. The running application consumes the configuration files and can render its values.
 
 1. Create a new Pod in a YAML file named `business-app.yaml`. The Pod should define two containers, one init container and one main application container. Name the init container `configurer` and the main container `web`. The init container uses the image `busybox`, the main container uses the image `bmuschko/nodejs-read-config:1.0.0`. Expose the main container on port 8080.
 2. Edit the YAML file by adding a new volume of type `emptyDir` that is mounted at `/usr/shared/app` for both containers.
@@ -259,13 +173,11 @@ Adding a temporary `sleep` command to the init container help with reserving tim
 </details>
 
 
-# Exercise 8
-
-In this exercise, you will implement the adapter pattern for a multi-container Pod.
-
 ## Implementing the Adapter Pattern
 
-The adapter pattern helps with providing a simplified, homogenized view of an application running within a container. For example, we could stand up another container that unifies the log output of the application container. As a result, other monitoring tools can rely on a standardized view of the log output without having to transform it into an expected format.
+- Adapter pattern for multi-container-pod
+
+- The adapter pattern helps with providing a simplified, homogenized view of an application running within a container. For example, we could stand up another container that unifies the log output of the application container. As a result, other monitoring tools can rely on a standardized view of the log output without having to transform it into an expected format.
 
 1. Create a new Pod in a YAML file named `adapter.yaml`. The Pod declares two containers. The container `app` uses the image `busybox` and runs the command `while true; do echo "$(date) | $(du -sh ~)" >> /var/logs/diskspace.txt; sleep 5; done;`. The adapter container `transformer` uses the image `busybox` and runs the command `sleep 20; while true; do while read LINE; do echo "$LINE" | cut -f2 -d"|" >> $(date +%Y-%m-%d-%H-%M-%S)-transformed.txt; done < /var/logs/diskspace.txt; sleep 20; done;` to strip the log output off the date for later consumption by a monitoring tool. Be aware that the logic does not handle corner cases (e.g. automatically deleting old entries) and would look different in production systems.
 2. Before creating the Pod, define an `emptyDir` volume. Mount the volume in both containers with the path `/var/logs`.
