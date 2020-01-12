@@ -55,7 +55,7 @@ spec:
 ```
 
 ```shell
-$kubectl exec -it nginx -- envFrom
+$ kubectl exec -it nginx -- envFrom
 DB=staging
 USERNAME=jdoe
 ...
