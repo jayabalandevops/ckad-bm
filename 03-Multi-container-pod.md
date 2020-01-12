@@ -1,4 +1,4 @@
-# Multi-Container Pods (10%)
+# Multi-Container Pods
 
 ## Implementing the Adapter Pattern
 
