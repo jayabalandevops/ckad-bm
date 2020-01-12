@@ -3,7 +3,7 @@
 ## Kubernetes Object Structure
 
 - API Version `v1`, `apps/v1`, ``
-- Kind `Pod`, `Deployment`, `Quota`, `ConfigMap`, ``
+- Kind `Pod`, `Deployment`, `Quota`, `ConfigMap`, `ResourceQuota`, `Secret`, ``
 - Metadata `Name`, `Namespace`, `Labels`, ``
 - Spec `Desired state`
 - Status `Actual state`
