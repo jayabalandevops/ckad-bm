@@ -72,13 +72,13 @@ spec:
   containers:
   - image: nginx
     name: backend
-	volumeMounts:
-	- name: config-volume
-	  mountPath: /etc/config
+    volumeMounts:
+    - name: config-volume
+      mountPath: /etc/config
   volumes:
   - name: config-volume
     configMap:
-	  name: db-config
+      name: db-config
 ```
 
 ```bash
