@@ -82,16 +82,10 @@ spec:
 ```
 
 ```shell
-$kubectl exec -it backend -- /bin/sh
-#ls /etc/config
+$ kubectl exec -it backend -- /bin/sh
+# ls /etc/config
 db
 username
-#cat /etc/config/db
+# cat /etc/config/db
 staging
 ```
-
-
-
-
-
-
